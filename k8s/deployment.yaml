@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: localhost:5001/cicd-lab:jenkins-gitops-68
+          image: localhost:5001/cicd-lab:jenkins-gitops-69
           imagePullPolicy: Always
           ports:
             - containerPort: 80
