@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cicd-lab
+  namespace: cicd-lab
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cicd-lab
+  template:
+    metadata:
+      labels:
+        app: cicd-lab
+    spec:
+      containers:
+        - name: web
+          image: localhost:5001/cicd-lab:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
