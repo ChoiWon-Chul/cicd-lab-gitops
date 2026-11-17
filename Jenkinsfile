@@ -37,8 +37,9 @@ EOF
         withCredentials([string(credentialsId: "github-gitops-pat", variable: "GITHUB_TOKEN")]) {
           sh '''
             set -eu
+            AUTH_HEADER=$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 | tr -d '\\n')
             rm -rf gitops-update
-            git -c http.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" clone --branch "${GITOPS_BRANCH}" "${GITOPS_REPO}" gitops-update
+            git -c http.extraheader="AUTHORIZATION: basic ${AUTH_HEADER}" clone --branch "${GITOPS_BRANCH}" "${GITOPS_REPO}" gitops-update
             cd gitops-update
             sed -i.bak -E "s#image: .*#image: ${IMAGE}#" k8s/deployment.yaml
             rm -f k8s/deployment.yaml.bak
@@ -47,7 +48,7 @@ EOF
             git config user.email "jenkins@localhost"
             git add k8s/deployment.yaml
             git commit -m "chore: promote ${IMAGE}"
-            git -c http.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin "${GITOPS_BRANCH}"
+            git -c http.extraheader="AUTHORIZATION: basic ${AUTH_HEADER}" push origin "${GITOPS_BRANCH}"
             echo "GitOps commit pushed"
           '''
         }
